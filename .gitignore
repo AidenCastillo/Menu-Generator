@@ -1,0 +1,5 @@
+./obj/
+.github
+.vscode
+./menu-generator
+obj/

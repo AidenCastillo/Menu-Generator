@@ -8,6 +8,7 @@ TARGET = menu-generator
 # Directories
 SRC_DIR = src
 OBJ_DIR = obj
+EXP_DIR = $(SRC_DIR)/exp
 
 # Source and object files
 SRCS = $(SRC_DIR)/main.c \
@@ -17,12 +18,20 @@ SRCS = $(SRC_DIR)/main.c \
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
+# Experimental executables
+EXP_SRCS = $(wildcard $(EXP_DIR)/*.c)
+EXP_TARGETS = $(EXP_SRCS:$(EXP_DIR)/%.c=./%)
+
 # Default target
-all: $(TARGET)
+all: $(TARGET) $(EXP_TARGETS)
 
 # Link object files into final executable
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
+
+# Compile experimental files as separate executables
+./% : $(EXP_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -o $@ $<
 
 # Compile source files into object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
@@ -34,11 +43,11 @@ $(OBJ_DIR):
 
 # Run the program (builds first if needed)
 run: all
-	./$(TARGET) config/menu.cfg
+	./$(TARGET)
 
 # Clean build artifacts
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET) $(EXP_TARGETS)
 
 # Phony targets
 .PHONY: all run clean
