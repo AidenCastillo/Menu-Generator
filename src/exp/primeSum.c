@@ -1,7 +1,7 @@
 #include <stdio.h>
 
+// Sum of all prime numbers below 1000. Used to verify EXEC type menu items.
 int main(void) {
-    // sums of primes up to 1000
     int sum = 0;
     for (int num = 2; num < 1000; num++) {
         int is_prime = 1;

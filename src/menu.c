@@ -8,40 +8,7 @@
 #include <termios.h>
 #include <ctype.h>
 
-// void generate_menu(MenuItem* items) {
-//     // 1. Enter alternate screen
-//     printf("\033[?1049h\033[H"); 
-//     // printf("Generating menu...\n");
-//     // TIOCGWINSZ: Get window size
-//     struct winsize w;
-//     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1) {
-//         // Handle error if ioctl fails
-//         fprintf(stderr, "ioctl failed (%d): %s\n", errno, strerror(errno));
-//         return;
-//     }
-
-//     for (int i = 0; i < w.ws_col; i++) {
-//         printf("-");
-//     }
-
-    
-
-//     for (int i = 0; i < 100; i++) {
-//         if (items[i].name == NULL) {
-//             break;
-//         }
-//         printf("%*s: ID=%d, Name=%s\n", (int)(w.ws_col * 0.3), "Menu Item", items[i].id, items[i].name);
-//     }
-//     char choice[10];
-//     printf("Enter your choice: ");
-//     fgets(choice, sizeof(choice), stdin);
-//     int choice_id = atoi(choice);
-//     printf("\033[?1049l"); 
-//     items[choice_id - 1].action(items[choice_id - 1].action_arg);
-//     // 2. Exit alternate screen (restores previous content)
-//     return;
-// }
-
+// Displays the menu on the terminal and incharge of highlighting the selected item.
 void display_menu(MenuItem* items, int selected) {
     // TIOCGWINSZ: Get window size
     struct winsize w;
@@ -51,6 +18,7 @@ void display_menu(MenuItem* items, int selected) {
         return;
     }
     printf("\033[H"); // Move cursor to top-left
+    // Creates buffer to hold menu content. Prints the entire screen at once instead of line by line to reduce flickering.
     char buffer[4096];
     snprintf(buffer, sizeof(buffer), "%*s\n", (int)(w.ws_col * 0.5), "Menu");
     snprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), "%*s\n", (int)(w.ws_col * 0.8), "Use Arrow Keys to navigate, Enter to select, or number keys to jump to an item");
@@ -66,10 +34,11 @@ void display_menu(MenuItem* items, int selected) {
     }
     printf("%s", buffer);
 }
-
+// Generate menu based on the provided MenuItem array pointer. Will handle user input and call appropriate function pointers in item structs. 
 void generate_menu(MenuItem* items) {
     int selected = 0;
     printf("\033[?1049h"); // Enter alternate screen
+    // User input handling
     struct termios oldt, newt;
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
@@ -77,10 +46,11 @@ void generate_menu(MenuItem* items) {
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
     display_menu(items, selected);
-
+    // Input loop
     while (1) {
         char ch = getchar();
         if (ch == '\033') { // Escape sequence
+            // When user uses arrow keys.
             getchar(); // skip the [
             switch(getchar()) {
                 case 'A': // Up arrow
@@ -91,12 +61,14 @@ void generate_menu(MenuItem* items) {
                     break;
             }
         } else if (ch == '\n') { // Enter key
+            // Execute the selected menu item
             printf("\033[?1049l"); // Exit alternate screen
             // To fix terminal state. If not done terminal wont display user input into command line.
             tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
             items[selected].action(items[selected].action_arg);
             return;
         } else if (isdigit(ch)) {
+            // If user presses a numbe key, execute the corresponding menu item if it exists.
             int num = ch - '0';
             if (items[num - 1].name != NULL) {
                 printf("\033[?1049l"); // Exit alternate screen
