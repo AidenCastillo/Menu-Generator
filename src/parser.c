@@ -3,16 +3,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "parser.h"
+#include "utils.h"
 #include "menu.h"
 #include "actions.h"
 
 MenuItem* main_menu; // Global pointer to main menu for easy access in action functions.
-
-// Remove leading whitespace from a string
-char* ltrim(char* s) {
-    while (*s == ' ' || *s == '\t') s++;
-    return s;
-}
 
 // Seperates a line from template file into its components. Returns MenuItem struct.
 MenuItem parseItem(char* line) {

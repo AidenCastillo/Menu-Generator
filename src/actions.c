@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "utils.h"
 
-void go_back_to_main_menu(MenuItem* item) {
+void go_back_to_main_menu(UNUSED MenuItem* item) {
     // This function can be used as the action for the "Exit" item in submenus to return to the main menu.
     // printf("Returning to main menu...\n");
 
@@ -16,7 +17,7 @@ void go_back_to_main_menu(MenuItem* item) {
 }
 
 // Example ACTION type function, lists files and folders in current directory.
-int list_files_action(MenuItem* item) {
+int list_files_action(UNUSED MenuItem* item) {
     DIR* d;
     struct dirent* dir;
     d = opendir(".");
