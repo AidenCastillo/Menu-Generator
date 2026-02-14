@@ -65,7 +65,9 @@ void generate_menu(MenuItem* items) {
             printf("\033[?1049l"); // Exit alternate screen
             // To fix terminal state. If not done terminal wont display user input into command line.
             tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-            items[selected].action(items[selected].action_arg);
+            if (items[selected].action != NULL) {
+                items[selected].action(&items[selected]);
+            }
             return;
         } else if (isdigit(ch)) {
             // If user presses a numbe key, execute the corresponding menu item if it exists.
@@ -73,7 +75,7 @@ void generate_menu(MenuItem* items) {
             if (items[num - 1].name != NULL) {
                 printf("\033[?1049l"); // Exit alternate screen
                 tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-                items[num - 1].action(items[num - 1].action_arg);
+                items[num - 1].action(&items[num - 1]);
                 return;
             }
         }
