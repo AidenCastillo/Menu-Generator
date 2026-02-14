@@ -82,3 +82,22 @@ void submenu_action(MenuItem* item) {
     generate_menu(item->submenu);
     return;
 }
+
+void toggle_boolean_value(MenuItem* item) {
+    // uses system() to toggle the environment variable specified in item->action_arg between "1" and "0".
+    char* var_name = item->action_arg;
+    char* current_value = getenv(var_name);
+    if (current_value == NULL) {
+        printf("Environment variable '%s' not found. Setting to '1'.\n", var_name);
+        setenv(var_name, "1", 1);
+    } else if (strcmp(current_value, "0") == 0) {
+        printf("Toggling '%s' from '0' to '1'.\n", var_name);
+        setenv(var_name, "1", 1);
+    } else {
+        printf("Toggling '%s' from '%s' to '0'.\n", var_name, current_value);
+        setenv(var_name, "0", 1);
+    }
+
+    generate_menu(main_menu);
+    return;
+}

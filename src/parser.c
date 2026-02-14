@@ -127,6 +127,34 @@ MenuItem* parse_menu_template(char* filename) {
                 // printf("Added 'Exit' to submenu '%s'\n", current_menu->name);
             }
             current_menu = NULL;
+        } else if (strncmp(trimmed_line, "VALUE", 5) == 0) {
+            // Change environemnt variable based on the value line. Format is `VALUE 5 "Prime Debug" Boolean "PRIME_DEBUG"`
+            MenuItem value_item = {0};
+            char name[256];
+            char var_name[256];
+            char var_type[16];
+            sscanf(trimmed_line, "VALUE %d \"%[^\"]\" %s \"%[^\"]\"", &value_item.id, name, var_type, var_name);
+            // printf("Parsed value: ID=%d, Name=%s, Type=%s, Var=%s\n", value_item.id, name, var_type, var_name);
+            value_item.name = malloc(strlen(name) + 1);
+            value_item.action_arg = malloc(strlen(var_name) + 1);
+            if (value_item.name == NULL || value_item.action_arg == NULL) {
+                perror("Failed to allocate memory for value item");
+                exit(1);
+            }
+            strcpy(value_item.name, name);
+            strcpy(value_item.action_arg, var_name);
+            if (strcmp(var_type, "Boolean") == 0) {
+                value_item.action = toggle_boolean_value;
+            } else {
+                value_item.action = NULL;
+            }
+            if (value_item.action != NULL) {
+                // printf("Parsed value item: ID=%d, Name=%s, Type=%s, Var=%s\n", value_item.id, value_item.name, var_type, value_item.action_arg);
+            } else {
+                // printf("Parsed value item with unknown type: ID=%d, Name=%s, Type=%s, Var=%s\n", value_item.id, value_item.name, var_type, value_item.action_arg);
+            }
+
+            items[count++] = value_item;
         }
     }
 
