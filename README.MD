@@ -4,8 +4,7 @@ a C based menu generator for terminal applications and scripts. Only thing requi
 
 
 # Compiling
-You are required to have 'make' install on your linux box(`sudo apt install make
-`).
+You are required to have 'make' install on your linux box(`sudo apt install make`).
 1. Compile the program using `make`
    1. This will also compile any programs in the `src/exp/` folder as seperate executables.
 2. Create a `menu-template.cfg` file in the same directory as the compiled program.

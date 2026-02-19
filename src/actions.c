@@ -65,6 +65,30 @@ void executable_function(MenuItem* item) {
     printf("Executable run with argument: %s\n", item->action_arg);
     char cmd[256];
     snprintf(cmd, sizeof(cmd), "./%s", item->action_arg);
+
+    // parse for $VAR in cmd and replace with environment variable value.
+    char* var_start = strstr(cmd, "$");
+
+    while (var_start) {
+        char* var_end = var_start + 1;
+        // stops when reaches a non-alphanumeric character like space or end of string.
+        while (*var_end && (isalnum(*var_end) || *var_end == '_')) {
+            var_end++;
+        }
+        char var_name[256];
+        strncpy(var_name, var_start + 1, var_end - var_start - 1);
+        var_name[var_end - var_start - 1] = '\0';
+        char* var_value = getenv(var_name);
+        if (var_value) {
+            char new_cmd[256];
+            snprintf(new_cmd, sizeof(new_cmd), "%.*s%s%s", (int)(var_start - cmd), cmd, var_value, var_end);
+            strncpy(cmd, new_cmd, sizeof(cmd));
+        } else {
+            printf("Environment variable '%s' not found. Leaving as is.\n", var_name);
+        }
+        var_start = strstr(var_start + 1, "$");
+    }
+    printf("Final command to execute: %s\n", cmd);
     int return_code = system(cmd);
     printf("Executable returned code: %d\n", return_code);
     return;
@@ -97,7 +121,7 @@ void toggle_boolean_value(MenuItem* item) {
         printf("Toggling '%s' from '%s' to '0'.\n", var_name, current_value);
         setenv(var_name, "0", 1);
     }
-
+    printf("Current value of '%s' is now: %s\n", var_name, getenv(var_name));
     generate_menu(main_menu);
     return;
 }

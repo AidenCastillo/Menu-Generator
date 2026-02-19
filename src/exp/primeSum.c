@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 // Sum of all prime numbers below 1000. Used to verify EXEC type menu items.
-int main(int arg) {
+int main(int argc, char* argv[]) {
     int sum = 0;
     for (int num = 2; num < 1000; num++) {
         int is_prime = 1;
@@ -13,13 +13,12 @@ int main(int arg) {
         }
         if (is_prime) {
             sum += num;
+            if (argc > 1) {
+                printf("DEBUG: Found prime: %d, current sum: %d\n", num, sum);
+            }
         }
     }
     printf("Sum of primes below 1000 is: %d\n", sum);
 
-    if (arg == 1) {
-        printf("Debug mode enabled.\n");
-        // Additional debug information can be printed here if needed.
-    }
     return 0;
 }
